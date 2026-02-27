@@ -1,6 +1,5 @@
 import os
-from datetime import datetime, timedelta, timezone
-from typing import Dict, Optional
+from datetime import UTC, datetime, timedelta
 
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
@@ -25,33 +24,33 @@ users_db = {
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Create JWT access token with optional expiration
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    """Create JWT access token with optional expiration.
 
     Args:
         data (dict): _description_
         expires_delta (Optional[timedelta], optional): _description_. Defaults to None.
+
     """
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+        expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict:
-    """Verify JWT token and return user info
+def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+    """Verify JWT token and return user info.
 
     Args:
         token (str, optional): _description_. Defaults to Depends(oauth2_scheme).
 
     Returns:
         Dict: _description_
+
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -66,7 +65,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict:
 
 
 def require_admin(user: dict = Depends(get_current_user)) -> dict:
-    """Dependency to require admin role"""
+    """Dependency to require admin role."""
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     return user

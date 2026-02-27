@@ -12,10 +12,20 @@ logger.add("log/data.log")
 
 @lru_cache(maxsize=1)
 def load_csv() -> pd.DataFrame:
+    """Load data.
+
+    Raises:
+        HTTPException: _description_
+
+    Returns:
+        pd.DataFrame: _description_
+
+    """
     try:
-        df = pd.DataFrame(
-            {"id": list(range(1, 3, 1)), "text": ["You are sweet", "Food is life"]}
-        )
+        df = pd.DataFrame({
+            "id": list(range(1, 3, 1)),
+            "text": ["You are sweet", "Food is life"],
+        })
         logger.info("Loaded csv")
         return df
     except Exception:
@@ -24,10 +34,11 @@ def load_csv() -> pd.DataFrame:
 
 
 def get_sdata_summary() -> dict:
-    """Get summary statistics about the data
+    """Get summary statistics about the data.
 
     Returns:
         dict: _description_
+
     """
     df = load_csv()
     return {

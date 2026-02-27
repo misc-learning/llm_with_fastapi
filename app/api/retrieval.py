@@ -4,7 +4,7 @@ from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI
 from loguru import logger
 
-from data import load_csv
+from app.data.data import load_csv
 
 logger.add("log/retrieval.log")
 
@@ -15,7 +15,7 @@ index_initialized = False
 
 
 def build_index():
-    """Build and cache vector index with error handling"""
+    """Build and cache vector index with error handling."""
     global query_engine, index_initialized
 
     try:
@@ -39,7 +39,7 @@ def build_index():
 
 
 def initialize_retrieval():
-    """Initialize retrieval system on startup"""
+    """Initialize retrieval system on startup."""
     global query_engine, index_initialized
     try:
         logger.info("Initializing retrieval system...")
@@ -55,13 +55,14 @@ def initialize_retrieval():
 
 
 def execute_query(question: str) -> str:
-    """Execute a query using the query engine
+    """Execute a query using the query engine.
 
     Args:
         question (str): _description_
 
     Returns:
         str: _description_
+
     """
     if query_engine is None:
         raise Exception("Query engine is not initialized")

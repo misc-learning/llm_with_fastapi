@@ -1,6 +1,6 @@
 [project]
 name = "llm-with-fastapi"
-version = "0.1.0"
+dynamic = ['version']
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi[standard]>=0.133.1",
@@ -13,3 +13,64 @@ dependencies = [
     "python-jose>=3.5.0",
     "uvicorn>=0.41.0",
 ]
+
+[build-system]
+requires = [
+  "setuptools>=72.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["app"]
+
+[tool.setuptools.dynamic]
+version = { file = ".version" }
+
+[tool.pytest.ini_options]
+testpaths = [ "tests" ]
+pythonpath = [ "." ]
+markers = [
+    "ci_exclude: Tests excluded from CI/CD pipeline"
+]
+addopts = [
+    "--cov=src",
+    "--cov-report=term",
+    "--cov-report=xml:coverage.xml"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "F",    # pyflakes rules
+    "E",    # pycodestyle error rules
+    "W",    # pycodestyle warning rules
+    "B",    # flake8-bugbear rules
+    "I",    # isort rules
+    "UP",   # pyupgrade rules
+    "SIM",  # flake8-simplify rules
+    "ERA",  # eradicate rules
+    "C",    # pylint convention rules
+    "D",    # pydocstyle rules
+    "ANN"   # flake8-annotations rules
+]
+ignore = ['B904', 'B008', 'E501', 'D203', 'D213', 'ERA001', 'ANN201', 'ANN401', 'D100']
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-line-length = "dynamic"
+preview = true
+
+[tool.ty.rules]
+index-out-of-bounds = "ignore"
+
+[tool.bandit]
+targets = ["src"]
+exclude_dirs = [".venv", "data", "dist", "docs", "log", "prcoelreso.egg-info", "temp", "test"]
+skips = ["B105"]

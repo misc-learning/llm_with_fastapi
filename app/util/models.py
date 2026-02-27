@@ -1,12 +1,12 @@
-from typing import Dict, List, Optional
-
 from pydantic import BaseModel
 
 
 class LoginRequest(BaseModel):
-    """Login request model
+    """Login request model.
+
     Args:
         BaseModel (_type_): _description_
+
     """
 
     username: str
@@ -14,21 +14,23 @@ class LoginRequest(BaseModel):
 
 
 class QueryRequest(BaseModel):
-    """Query request mode
+    """Query request mode.
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     question: str
-    context_length: Optional[int] = 2
+    context_length: int | None = 2
 
 
 class QueryResponse(BaseModel):
-    """Query response model
+    """Query response model.
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     question: str
@@ -39,10 +41,11 @@ class QueryResponse(BaseModel):
 
 
 class HealthResponse(BaseModel):
-    """Health check response
+    """Health check response.
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     status: str
@@ -51,10 +54,11 @@ class HealthResponse(BaseModel):
 
 
 class DashboardResponse(BaseModel):
-    """Dashbaord metrics response
+    """Dashbaord metrics response.
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     status: str
@@ -67,10 +71,11 @@ class DashboardResponse(BaseModel):
 
 
 class TokenResponse(BaseModel):
-    """Token response model
+    """Token response model.
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     access_token: str
@@ -79,12 +84,13 @@ class TokenResponse(BaseModel):
 
 
 class HistoryResponse(BaseModel):
-    """Query history response
+    """Query history response.
 
     Args:
         BaseModel (_type_): _description_
+
     """
 
     user: str
     query_count: int
-    history: List[Dict]
+    history: list[dict]

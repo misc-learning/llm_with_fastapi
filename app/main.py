@@ -7,15 +7,16 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 
-from analytics import (
+from app.api.retrieval import execute_query, initialize_retrieval
+from app.auth.auth import create_access_token, get_current_user, require_admin, users_db
+from app.util.analytics import (
     cache_query,
     get_analytics_summary,
     get_cached_query,
     get_user_history,
     track_request,
 )
-from auth import create_access_token, get_current_user, require_admin, users_db
-from models import (
+from app.util.models import (
     DashboardResponse,
     HealthResponse,
     HistoryResponse,
@@ -24,7 +25,6 @@ from models import (
     QueryResponse,
     TokenResponse,
 )
-from retrieval import execute_query, initialize_retrieval
 
 # setup logging
 logger.add("log/main.log")
@@ -60,18 +60,20 @@ else:
 # authentification endpoints
 @app.post("/token", response_model=TokenResponse)
 async def login(credentials: LoginRequest):
-    """Login endpoint to obtain JWT token (accepts json)
+    """Login endpoint to obtain JWT token (accepts json).
 
     Args:
         credentials (LoginRequest): _description_
+
     """
     user = users_db.get(credentials.username)
     if not user or user["password"] != credentials.password:
         logger.warning(f"Failed login attempt for user: {credentials.username}")
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-    access_token = create_access_token(
-        {"sub": credentials.username, "role": user["role"]}
-    )
+    access_token = create_access_token({
+        "sub": credentials.username,
+        "role": user["role"],
+    })
     logger.info(f"User {credentials.username} logged in successfully")
     return {"access_token": access_token, "token_type": "bearer", "role": user["role"]}
 
@@ -79,11 +81,12 @@ async def login(credentials: LoginRequest):
 # query endpoints
 @app.post("/ask", response_model=QueryResponse)
 async def ask_question(request: QueryRequest, user: dict = Depends(get_current_user)):
-    """Query endpoint with caching and performance tracking
+    """Query endpoint with caching and performance tracking.
 
     Args:
         request (QueryRequest): _description_
         user (dict, optional): _description_. Defaults to Depends(get_current_user).
+
     """
     start_time = time.time()
     cache_key = f"{request.question}:{user['username']}"
@@ -125,10 +128,11 @@ async def ask_question(request: QueryRequest, user: dict = Depends(get_current_u
 
 @app.get("/history", response_model=HistoryResponse)
 async def get_history(user: dict = Depends(get_current_user)):
-    """Get query history for current user
+    """Get query history for current user.
 
     Args:
         user (dict, optional): _description_. Defaults to Depends(get_current_user).
+
     """
     history = get_user_history(user["username"])
     return {
@@ -141,7 +145,7 @@ async def get_history(user: dict = Depends(get_current_user)):
 # health and monitorung endpoints
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
-    """Health check point"""
+    """Check health check point."""
     analytics = get_analytics_summary()
     return {
         "status": "healthy",
@@ -152,10 +156,11 @@ async def health_check():
 
 @app.get("/dashboard", response_model=DashboardResponse)
 async def dashboard(user: dict = Depends(get_current_user)):
-    """Advanced monitoring dashboard with detailed metrics
+    """Advanced monitoring dashboard with detailed metrics.
 
     Args:
         user (dict, optional): _description_. Defaults to Depends(get_current_user).
+
     """
     analytics = get_analytics_summary()
     return {
@@ -171,10 +176,11 @@ async def dashboard(user: dict = Depends(get_current_user)):
 
 @app.get("/admin/stats")
 async def admin_stats(user: dict = Depends(require_admin)):
-    """Admin only endpoint for comprehensive statistics
+    """Admin only endpoint for comprehensive statistics.
 
     Args:
         user (dict, optional): _description_. Defaults to Depends(require_admin).
+
     """
     analytics = get_analytics_summary()
     return {
@@ -189,7 +195,7 @@ async def admin_stats(user: dict = Depends(require_admin)):
 # landing page
 @app.get("/", response_class=FileResponse)
 async def landing_page():
-    """Serve the landing page HTML"""
+    """Serve the landing page HTML."""
     current_dir = os.path.dirname(os.path.abspath(__file__))
     html_file = os.path.join(current_dir, "static", "index.html")
 

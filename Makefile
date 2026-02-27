@@ -26,4 +26,4 @@ clean:
 stage_changes:
 	git add .
 
-all: sync format lint type_check security_check build clean precommit_check stage_changes
+all: sync format lint type_check security_check build precommit_check clean stage_changes
