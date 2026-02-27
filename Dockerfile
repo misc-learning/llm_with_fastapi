@@ -6,7 +6,7 @@ COPY pyproject.toml .
 RUN uv sync --all-groups
 
 # copy all py files
-COPY *.py .
+COPY app/ ./app/
 
 # Copy static files and template
 COPY static/ ./static/
