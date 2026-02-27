@@ -32,8 +32,8 @@ jobs:
           echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
         continue-on-error: true
 
-      - name: Copy the app folder
-        run: cp pyproject.toml .
+      # - name: Copy the app folder
+      #   run: cp pyproject.toml .
 
       # - name: Verify required files
       #   run: |
