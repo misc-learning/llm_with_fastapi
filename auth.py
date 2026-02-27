@@ -12,7 +12,7 @@ load_dotenv()
 
 logger.add("log/auth.log")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "secret key to connect the llm")
+SECRET_KEY = os.getenv("GEMINI_SECRET_KEY", "secret key to connect the llm")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 

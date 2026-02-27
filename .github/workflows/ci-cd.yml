@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v2
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: Create .env for testing
+        run: |
+          echo "GEMINI_API_KEY=cle" > .env
+          echo "GEMINI_SECRET_KEY=cle" >> .env
+          echo "ALGORITHM=HS256" >> .env
+          echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
+        continue-on-error: true
+
+      - name: Verify required files
+        run: |
+          echo "Checking required files for deployment..."
+          files=("Dockerfile" "analytics.py" "auth.py" "data.py" "main.py" "models.py" "pyproject.toml" "retrieval.py" "static/index.html")
+          for file in "${files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file found"
+            else
+              echo "✗ $file missing"
+              exit 1
+            fi
+          done
+          echo "All required files present!"
+
+      - name: Lint code with Ruff
+        run: uvx ruff check . --fix --no-cache --respect-gitignore --config pyproject.toml --exit-zero
+        continue-on-error: true
+
+      # - name: Run basic tests
+      #   run: uv run python -m unittest discover tests 2>/dev/null || echo "No tests found, skipping."
+      #   continue-on-error: true
+
+      - name: Build Docker image
+        run: docker build -t llm_with_fastapi .

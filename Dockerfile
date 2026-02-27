@@ -2,14 +2,14 @@ FROM python:3.10-slim
 
 WORKDIR /app
 #TODO change it for uv
-COPY requirements.txt .
-RUN pip install --nocache-dir -r requirements.txt
+COPY pyproject.toml .
+RUN uv sync --all-groups
 
 # copy all py files
 COPY *.py .
 
 # Copy static files and template
-COPT static/ ./static/
+COPY static/ ./static/
 
 RUN mkdir -p /app/data
 

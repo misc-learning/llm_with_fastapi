@@ -1,0 +1,43 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# See https://mlops-coding-course.fmind.dev/5.%20Refining/5.2.%20Pre-Commit%20Hooks.html
+
+default_language_version:
+  python: python3.12
+repos:
+  # Standard checks for file integrity and syntax
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 'v2.3.0'
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: pretty-format-json
+        args: [--autofix]
+      - id: check-ast
+      - id: check-docstring-first
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, master]
+      - id: check-builtin-literals
+      - id: detect-private-key
+
+  # Ultra-fast Python linter and formatter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.9.9' # Use a recent version
+    hooks:
+      - id: ruff # Lints the code for errors and style issues
+      - id: ruff-format # Formats the code
+
+  # Security scanner for finding common vulnerabilities in Python code
+  - repo: https://github.com/PyCQA/bandit
+    rev: '1.8.3' # Use a recent version
+    hooks:
+    - id: bandit
+      args: ["-c", "pyproject.toml"] # Point to the Bandit config in pyproject.toml
+      additional_dependencies: ["bandit[toml]"]
