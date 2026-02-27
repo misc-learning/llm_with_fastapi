@@ -1,5 +1,6 @@
 import os
 import time
+from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import FileResponse
@@ -13,7 +14,7 @@ from analytics import (
     get_user_history,
     track_request,
 )
-from auth import create_access_token, get_current_user, require_admin, user_db
+from auth import create_access_token, get_current_user, require_admin, users_db
 from models import (
     DashboardResponse,
     HealthResponse,
@@ -28,11 +29,24 @@ from retrieval import execute_query, initialize_retrieval
 # setup logging
 logger.add("log/main.log")
 
-# initialize app
+
+# initialize retrieval system on startup
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage application lifespan events."""
+    # Startup
+    initialize_retrieval()
+    logger.info("Application started successfully")
+    yield
+    # Shutdown
+    logger.info("Application shutting down")
+
+
 app = FastAPI(
     title="LLM with FastAPI",
     version="1.0",
     description="Advanced AI Data Pipeline with authentification and monitoring",
+    lifespan=lifespan,
 )
 
 # mount static files
@@ -43,20 +57,6 @@ else:
     logger.warning(f"Static directory not found: {static_dir}")
 
 
-# initialize retrieval system on startup
-@app.on_event("startup")
-async def startup_event():
-    """Initialize retrieval system on app startup."""
-    initialize_retrieval()
-    logger.info("Application started successfully")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Clean on app shutdown."""
-    logger.info("Application shtting down")
-
-
 # authentification endpoints
 @app.post("/token", response_model=TokenResponse)
 async def login(credentials: LoginRequest):
@@ -65,7 +65,7 @@ async def login(credentials: LoginRequest):
     Args:
         credentials (LoginRequest): _description_
     """
-    user = user_db.get(credentials.username)
+    user = users_db.get(credentials.username)
     if not user or user["password"] != credentials.password:
         logger.warning(f"Failed login attempt for user: {credentials.username}")
         raise HTTPException(status_code=400, detail="Incorrect username or password")

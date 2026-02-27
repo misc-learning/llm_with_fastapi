@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List
 
 from dotenv import load_dotenv
@@ -24,7 +24,7 @@ def track_request(username: str, question: str, response_time: float):
     request_history[username].append(
         {
             "question": question,
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "response_time": response_time,
         }
     )
@@ -41,7 +41,7 @@ def cache_query(cache_key: str, anwer: str, username: str):
     """
     query_cache[cache_key] = {
         "answer": anwer,
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "user": username,
     }
     logger.info(f"Query cached with key: {cache_key[:30]}...")
@@ -101,7 +101,7 @@ def clear_old_cache(max_age_seconds: int = 3000):
     Args:
         max_age_seconds (int, optional): _description_. Defaults to 3000.
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     keys_to_remove = []
 
     for key, value in query_cache.items():

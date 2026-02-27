@@ -38,7 +38,7 @@ def build_index():
         return None
 
 
-def initialized_retrieval():
+def initialize_retrieval():
     """Initialize retrieval system on startup"""
     global query_engine, index_initialized
     try:
