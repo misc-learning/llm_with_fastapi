@@ -33,7 +33,7 @@ jobs:
         continue-on-error: true
 
       - name: Copy the app folder
-        run: cp -r app/ .
+        run: cp pyproject.toml .
 
       # - name: Verify required files
       #   run: |
