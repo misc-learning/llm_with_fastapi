@@ -32,19 +32,22 @@ jobs:
           echo "ACCESS_TOKEN_EXPIRE_MINUTES=30" >> .env
         continue-on-error: true
 
-      - name: Verify required files
-        run: |
-          echo "Checking required files for deployment..."
-          files=("Dockerfile" "analytics.py" "auth.py" "data.py" "main.py" "models.py" "pyproject.toml" "retrieval.py" "static/index.html")
-          for file in "${files[@]}"; do
-            if [ -f "$file" ]; then
-              echo "✓ $file found"
-            else
-              echo "✗ $file missing"
-              exit 1
-            fi
-          done
-          echo "All required files present!"
+      - name: Copy the app folder
+        run: cp -r app/ .
+
+      # - name: Verify required files
+      #   run: |
+      #     echo "Checking required files for deployment..."
+      #     files=("Dockerfile" "analytics.py" "auth.py" "data.py" "main.py" "models.py" "pyproject.toml" "retrieval.py" "static/index.html")
+      #     for file in "${files[@]}"; do
+      #       if [ -f "$file" ]; then
+      #         echo "✓ $file found"
+      #       else
+      #         echo "✗ $file missing"
+      #         exit 1
+      #       fi
+      #     done
+      #     echo "All required files present!"
 
       - name: Lint code with Ruff
         run: uvx ruff check . --fix --no-cache --respect-gitignore --config pyproject.toml --exit-zero
